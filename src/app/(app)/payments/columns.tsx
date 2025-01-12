@@ -13,6 +13,7 @@ import {
 import MoneyWithCurrency from "@/components/ui/money-with-currency";
 import { PaymentStatus, type Prisma } from "@prisma/client";
 import { type ColumnDef } from "@tanstack/react-table";
+import { format } from "date-fns";
 import { ArrowUpDown, MoreHorizontal } from "lucide-react";
 
 type PaymentWithClient = Prisma.PaymentGetPayload<{
@@ -58,6 +59,18 @@ export const getPaymentColumns = ({
       );
     },
     cell: ({ row }) => <div className="px-4">{row.original.client.name}</div>,
+  },
+  {
+    accessorKey: "date",
+    header: "Date",
+    cell: ({ row }) => (
+      <div>{format(new Date(row.original.date), "yyyy-MM-dd")}</div>
+    ),
+  },
+  {
+    accessorKey: "schedule",
+    header: "Schedule",
+    cell: ({ row }) => <div>{row.original.schedule}</div>,
   },
   {
     accessorKey: "amount",

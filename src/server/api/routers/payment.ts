@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 import { createTRPCRouter, publicProcedure } from "@/server/api/trpc";
+import { PaymentSchedule } from "@prisma/client";
 
 export const paymentRouter = createTRPCRouter({
   getAll: publicProcedure.query(async ({ ctx }) => {
@@ -16,6 +17,8 @@ export const paymentRouter = createTRPCRouter({
     .input(
       z.object({
         clientId: z.string().cuid(),
+        date: z.date(),
+        schedule: z.nativeEnum(PaymentSchedule),
         amount: z.number(),
       }),
     )
@@ -23,6 +26,8 @@ export const paymentRouter = createTRPCRouter({
       return ctx.db.payment.create({
         data: {
           clientId: input.clientId,
+          date: input.date,
+          schedule: input.schedule,
           amount: input.amount,
         },
       });
@@ -33,6 +38,8 @@ export const paymentRouter = createTRPCRouter({
       z.object({
         id: z.string().cuid(),
         clientId: z.string().cuid(),
+        date: z.date(),
+        schedule: z.nativeEnum(PaymentSchedule),
         amount: z.number(),
       }),
     )
@@ -41,6 +48,8 @@ export const paymentRouter = createTRPCRouter({
         where: { id: input.id },
         data: {
           clientId: input.clientId,
+          date: input.date,
+          schedule: input.schedule,
           amount: input.amount,
         },
       });

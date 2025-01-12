@@ -19,11 +19,19 @@ enum PaymentStatus {
     PAID
 }
 
+enum PaymentSchedule {
+    ONCE
+    MONTHLY
+    YEARLY
+}
+
 model Payment {
-    id       String        @id @default(cuid())
-    status   PaymentStatus @default(UNPAID)
-    amount   Decimal       @default(0) @db.Money
-    client   Client        @relation(fields: [clientId], references: [id])
+    id       String          @id @default(cuid())
+    status   PaymentStatus   @default(UNPAID)
+    date     DateTime        @db.Date
+    schedule PaymentSchedule
+    amount   Decimal         @default(0) @db.Money
+    client   Client          @relation(fields: [clientId], references: [id])
     clientId String
 }
 

@@ -9,6 +9,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { format } from "date-fns";
 import { useEffect } from "react";
 import { type SubmitHandler, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -22,7 +23,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { api } from "@/trpc/react";
-import type { Payment } from "@prisma/client";
+import { PaymentSchedule, type Payment } from "@prisma/client";
 import {
   Select,
   SelectContent,
@@ -31,11 +32,19 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import {
+  cn,
   convertCurrencyToNumber,
   isAmountWithinRange,
   MAX_VALUE,
+  removeTimezoneFromDate,
 } from "@/lib/utils";
-import { Loader2 } from "lucide-react";
+import { CalendarIcon, Loader2 } from "lucide-react";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
 
 const formSchema = z.object({
   clientId: z
@@ -43,6 +52,12 @@ const formSchema = z.object({
       required_error: "Client is empty",
     })
     .cuid(),
+  date: z.date({
+    required_error: "Date is empty",
+  }),
+  schedule: z.nativeEnum(PaymentSchedule, {
+    required_error: "Schedule is empty",
+  }),
   amount: z
     .string({
       required_error: "Amount is empty",
@@ -68,6 +83,8 @@ const PaymentForm = ({ isOpen, onOpenChange, payment }: PaymentFormProps) => {
     resolver: zodResolver(formSchema),
     defaultValues: {
       clientId: "",
+      date: undefined,
+      schedule: undefined,
       amount: "",
     },
     mode: "onChange",
@@ -85,11 +102,15 @@ const PaymentForm = ({ isOpen, onOpenChange, payment }: PaymentFormProps) => {
     if (payment) {
       form.reset({
         clientId: payment.clientId,
+        date: new Date(payment.date),
+        schedule: payment.schedule,
         amount: Number(payment.amount).toFixed(2),
       });
     } else {
       form.reset({
         clientId: "",
+        date: undefined,
+        schedule: undefined,
         amount: "",
       });
     }
@@ -100,6 +121,8 @@ const PaymentForm = ({ isOpen, onOpenChange, payment }: PaymentFormProps) => {
   ) => {
     const newPayment = {
       clientId: values.clientId,
+      date: removeTimezoneFromDate(values.date),
+      schedule: values.schedule,
       amount: convertCurrencyToNumber(values.amount),
     };
     if (payment) {
@@ -146,6 +169,72 @@ const PaymentForm = ({ isOpen, onOpenChange, payment }: PaymentFormProps) => {
                       {clients.map((client) => (
                         <SelectItem key={client.id} value={client.id}>
                           {client.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="date"
+              render={({ field }) => (
+                <FormItem className="flex flex-col">
+                  <FormLabel>Date</FormLabel>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <FormControl>
+                        <Button
+                          variant={"outline"}
+                          className={cn(
+                            "pl-3 text-left font-normal",
+                            !field.value && "text-muted-foreground",
+                          )}
+                        >
+                          {field.value ? (
+                            format(field.value, "yyyy-MM-dd")
+                          ) : (
+                            <span>Pick a date</span>
+                          )}
+                          <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                        </Button>
+                      </FormControl>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar
+                        mode="single"
+                        selected={field.value}
+                        onSelect={field.onChange}
+                        disabled={(date) => date < new Date("1900-01-01")}
+                        initialFocus
+                      />
+                    </PopoverContent>
+                  </Popover>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="schedule"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Schedule</FormLabel>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select a schedule" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {Object.keys(PaymentSchedule).map((schedule) => (
+                        <SelectItem key={schedule} value={schedule}>
+                          {schedule}
                         </SelectItem>
                       ))}
                     </SelectContent>

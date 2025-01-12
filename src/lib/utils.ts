@@ -24,3 +24,7 @@ export const convertCurrencyToNumber = (amount: string): number =>
 
 export const isAmountWithinRange = (amount: number): boolean =>
   MAX_VALUE * -1 <= amount && amount <= MAX_VALUE;
+
+export const removeTimezoneFromDate = (date: Date): Date => {
+  return new Date(date.getTime() - date.getTimezoneOffset() * 60000);
+};
