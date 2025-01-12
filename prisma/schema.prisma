@@ -14,16 +14,24 @@ datasource db {
     url      = env("DATABASE_URL")
 }
 
-model Post {
-    id        Int      @id @default(autoincrement())
-    name      String
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+enum PaymentStatus {
+    UNPAID
+    PAID
+}
 
-    createdBy   User   @relation(fields: [createdById], references: [id])
-    createdById String
+model Payment {
+    id       String        @id @default(cuid())
+    status   PaymentStatus @default(UNPAID)
+    amount   Decimal       @default(0) @db.Money
+    client   Client        @relation(fields: [clientId], references: [id])
+    clientId String
+}
 
-    @@index([name])
+model Client {
+    id       String    @id @default(cuid())
+    name     String
+    email    String
+    payments Payment[]
 }
 
 // Necessary for Next auth
@@ -62,7 +70,6 @@ model User {
     image         String?
     accounts      Account[]
     sessions      Session[]
-    posts         Post[]
 }
 
 model VerificationToken {

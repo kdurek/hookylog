@@ -26,6 +26,14 @@ const data = {
           title: "Dashboard",
           url: "/",
         },
+        {
+          title: "Payments",
+          url: "/payments",
+        },
+        {
+          title: "Clients",
+          url: "/clients",
+        },
       ],
     },
   ],
