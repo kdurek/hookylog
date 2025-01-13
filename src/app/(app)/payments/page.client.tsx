@@ -10,6 +10,7 @@ import PaymentForm from "@/app/(app)/payments/form";
 export default function PaymentsPageClient() {
   const [payments] = api.payment.getAll.useSuspenseQuery();
   const deleteMutation = api.payment.delete.useMutation();
+  const setAsPaidMutation = api.payment.setAsPaid.useMutation();
 
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
   const [selectedPayment, setSelectedPayment] = useState<Payment | null>(null);
@@ -26,13 +27,20 @@ export default function PaymentsPageClient() {
     [deleteMutation],
   );
 
+  const onSetAsPaid = useCallback(
+    (payment: Payment) => {
+      setAsPaidMutation.mutate({ id: payment.id });
+    },
+    [setAsPaidMutation],
+  );
+
   const paymentsColumns = useMemo(
-    () => getPaymentColumns({ onUpdate, onDelete }),
-    [onDelete, onUpdate],
+    () => getPaymentColumns({ onUpdate, onDelete, onSetAsPaid }),
+    [onUpdate, onDelete, onSetAsPaid],
   );
 
   return (
-    <div className="p-4">
+    <div className="max-w-[100vw] p-4 md:max-w-[calc(100vw-16rem)]">
       <DataTable
         columns={paymentsColumns}
         data={payments}

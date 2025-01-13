@@ -23,48 +23,62 @@ type PaymentWithClient = Prisma.PaymentGetPayload<{
 interface PaymentColumnsProps {
   onUpdate: (payment: PaymentWithClient) => void;
   onDelete: (payment: PaymentWithClient) => void;
+  onSetAsPaid: (payment: PaymentWithClient) => void;
 }
 
 export const getPaymentColumns = ({
   onUpdate,
   onDelete,
+  onSetAsPaid,
 }: PaymentColumnsProps): ColumnDef<PaymentWithClient>[] => [
   {
     accessorKey: "status",
-    header: "Status",
-    cell: ({ row }) => (
-      <Badge
-        variant="outline"
-        className={
-          row.getValue("status") === PaymentStatus.PAID
-            ? "border-green-500"
-            : "border-red-500"
-        }
-      >
-        {row.getValue("status")}
-      </Badge>
-    ),
-  },
-  {
-    accessorKey: "client",
     header: ({ column }) => {
       return (
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
-          Client
+          Status
           <ArrowUpDown />
         </Button>
       );
     },
-    cell: ({ row }) => <div className="px-4">{row.original.client.name}</div>,
+    cell: ({ row }) => (
+      <div className="px-4">
+        <Badge
+          variant="outline"
+          className={
+            row.original.status === PaymentStatus.PAID
+              ? "border-green-500"
+              : "border-red-500"
+          }
+        >
+          {row.original.status}
+        </Badge>
+      </div>
+    ),
+  },
+  {
+    accessorKey: "client",
+    header: "Client",
+    cell: ({ row }) => <div>{row.original.client.name}</div>,
   },
   {
     accessorKey: "date",
-    header: "Date",
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Date
+          <ArrowUpDown />
+        </Button>
+      );
+    },
     cell: ({ row }) => (
-      <div>{format(new Date(row.original.date), "yyyy-MM-dd")}</div>
+      <div className="px-4">{format(row.original.date, "yyyy-MM-dd")}</div>
     ),
   },
   {
@@ -76,15 +90,13 @@ export const getPaymentColumns = ({
     accessorKey: "amount",
     header: () => <div className="text-right">Amount</div>,
     cell: ({ row }) => (
-      <MoneyWithCurrency amount={parseFloat(row.getValue("amount"))} />
+      <MoneyWithCurrency amount={Number(row.original.amount)} />
     ),
   },
   {
     id: "actions",
     enableHiding: false,
     cell: ({ row }) => {
-      const payment = row.original;
-
       return (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -96,9 +108,15 @@ export const getPaymentColumns = ({
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
             <DropdownMenuItem
-              onClick={() => navigator.clipboard.writeText(payment.id)}
+              onClick={() => navigator.clipboard.writeText(row.original.id)}
             >
               Copy payment ID
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={() => onSetAsPaid(row.original)}
+              disabled={row.original.status === PaymentStatus.PAID}
+            >
+              Set as paid
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={() => onUpdate(row.original)}>

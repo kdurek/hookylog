@@ -56,8 +56,6 @@ export const getClientColumns = ({
     id: "actions",
     enableHiding: false,
     cell: ({ row }) => {
-      const client = row.original;
-
       return (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -69,7 +67,7 @@ export const getClientColumns = ({
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
             <DropdownMenuItem
-              onClick={() => navigator.clipboard.writeText(client.id)}
+              onClick={() => navigator.clipboard.writeText(row.original.id)}
             >
               Copy client ID
             </DropdownMenuItem>

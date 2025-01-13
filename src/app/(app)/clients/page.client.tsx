@@ -32,7 +32,7 @@ export default function ClientsPageClient() {
   );
 
   return (
-    <div className="p-4">
+    <div className="max-w-[100vw] p-4 md:max-w-[calc(100vw-16rem)]">
       <DataTable
         columns={clientsColumns}
         data={clients}

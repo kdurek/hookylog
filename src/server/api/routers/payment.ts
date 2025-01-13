@@ -1,19 +1,24 @@
 import { z } from "zod";
 
-import { createTRPCRouter, publicProcedure } from "@/server/api/trpc";
-import { PaymentSchedule } from "@prisma/client";
+import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc";
+import { PaymentSchedule, PaymentStatus } from "@prisma/client";
+import { TRPCError } from "@trpc/server";
+import { addMonths, addYears } from "date-fns";
 
 export const paymentRouter = createTRPCRouter({
-  getAll: publicProcedure.query(async ({ ctx }) => {
+  getAll: protectedProcedure.query(async ({ ctx }) => {
     const payments = await ctx.db.payment.findMany({
       include: {
         client: true,
+      },
+      orderBy: {
+        date: "desc",
       },
     });
     return payments;
   }),
 
-  create: publicProcedure
+  create: protectedProcedure
     .input(
       z.object({
         clientId: z.string().cuid(),
@@ -33,7 +38,7 @@ export const paymentRouter = createTRPCRouter({
       });
     }),
 
-  update: publicProcedure
+  update: protectedProcedure
     .input(
       z.object({
         id: z.string().cuid(),
@@ -55,7 +60,7 @@ export const paymentRouter = createTRPCRouter({
       });
     }),
 
-  delete: publicProcedure
+  delete: protectedProcedure
     .input(
       z.object({
         id: z.string().cuid(),
@@ -64,6 +69,62 @@ export const paymentRouter = createTRPCRouter({
     .mutation(async ({ ctx, input }) => {
       return ctx.db.payment.delete({
         where: { id: input.id },
+      });
+    }),
+
+  setAsPaid: protectedProcedure
+    .input(
+      z.object({
+        id: z.string().cuid(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const currentPayment = await ctx.db.payment.findUnique({
+        where: { id: input.id },
+      });
+
+      if (currentPayment?.status === PaymentStatus.PAID) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Payment is already paid",
+        });
+      }
+
+      const paidPayment = await ctx.db.payment.update({
+        where: { id: input.id },
+        data: {
+          status: PaymentStatus.PAID,
+        },
+      });
+
+      const newDateBasedOnSchedule = (
+        date: Date,
+        schedule: PaymentSchedule,
+      ) => {
+        switch (schedule) {
+          case PaymentSchedule.MONTHLY:
+            return addMonths(date, 1);
+          case PaymentSchedule.YEARLY:
+            return addYears(date, 1);
+        }
+      };
+
+      const newDate = newDateBasedOnSchedule(
+        paidPayment.date,
+        paidPayment.schedule,
+      );
+
+      if (!newDate) {
+        return paidPayment;
+      }
+
+      return ctx.db.payment.create({
+        data: {
+          clientId: paidPayment.clientId,
+          date: newDate,
+          schedule: paidPayment.schedule,
+          amount: paidPayment.amount,
+        },
       });
     }),
 });
