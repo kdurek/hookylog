@@ -40,13 +40,11 @@ const formSchema = z.object({
     .string({
       required_error: "Email is empty",
     })
-    .email()
     .optional(),
   phone: z
     .string({
       required_error: "Phone is empty",
     })
-    .min(9)
     .optional(),
 });
 

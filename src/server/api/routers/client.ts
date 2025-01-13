@@ -12,7 +12,7 @@ export const clientRouter = createTRPCRouter({
       z.object({
         name: z.string(),
         company: z.string().optional(),
-        email: z.string().email().optional(),
+        email: z.string().optional(),
         phone: z.string().optional(),
       }),
     )
@@ -33,7 +33,7 @@ export const clientRouter = createTRPCRouter({
         id: z.string().cuid(),
         name: z.string(),
         company: z.string().optional(),
-        email: z.string().email().optional(),
+        email: z.string().optional(),
         phone: z.string().optional(),
       }),
     )
