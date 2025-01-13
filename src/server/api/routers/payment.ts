@@ -21,6 +21,7 @@ export const paymentRouter = createTRPCRouter({
   create: protectedProcedure
     .input(
       z.object({
+        name: z.string(),
         clientId: z.string().cuid(),
         date: z.date(),
         schedule: z.nativeEnum(PaymentSchedule),
@@ -30,6 +31,7 @@ export const paymentRouter = createTRPCRouter({
     .mutation(async ({ ctx, input }) => {
       return ctx.db.payment.create({
         data: {
+          name: input.name,
           clientId: input.clientId,
           date: input.date,
           schedule: input.schedule,
@@ -42,6 +44,7 @@ export const paymentRouter = createTRPCRouter({
     .input(
       z.object({
         id: z.string().cuid(),
+        name: z.string(),
         clientId: z.string().cuid(),
         date: z.date(),
         schedule: z.nativeEnum(PaymentSchedule),
@@ -52,6 +55,7 @@ export const paymentRouter = createTRPCRouter({
       return ctx.db.payment.update({
         where: { id: input.id },
         data: {
+          name: input.name,
           clientId: input.clientId,
           date: input.date,
           schedule: input.schedule,
@@ -120,6 +124,7 @@ export const paymentRouter = createTRPCRouter({
 
       return ctx.db.payment.create({
         data: {
+          name: paidPayment.name,
           clientId: paidPayment.clientId,
           date: newDate,
           schedule: paidPayment.schedule,

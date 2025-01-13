@@ -45,8 +45,14 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
+import { Input } from "@/components/ui/input";
 
 const formSchema = z.object({
+  name: z
+    .string({
+      required_error: "Name is empty",
+    })
+    .min(3),
   clientId: z
     .string({
       required_error: "Client is empty",
@@ -82,6 +88,7 @@ const PaymentForm = ({ isOpen, onOpenChange, payment }: PaymentFormProps) => {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
+      name: "",
       clientId: "",
       date: undefined,
       schedule: undefined,
@@ -101,6 +108,7 @@ const PaymentForm = ({ isOpen, onOpenChange, payment }: PaymentFormProps) => {
   useEffect(() => {
     if (payment) {
       form.reset({
+        name: payment.name,
         clientId: payment.clientId,
         date: new Date(payment.date),
         schedule: payment.schedule,
@@ -108,6 +116,7 @@ const PaymentForm = ({ isOpen, onOpenChange, payment }: PaymentFormProps) => {
       });
     } else {
       form.reset({
+        name: "",
         clientId: "",
         date: undefined,
         schedule: undefined,
@@ -120,6 +129,7 @@ const PaymentForm = ({ isOpen, onOpenChange, payment }: PaymentFormProps) => {
     values: z.infer<typeof formSchema>,
   ) => {
     const newPayment = {
+      name: values.name,
       clientId: values.clientId,
       date: removeTimezoneFromDate(values.date),
       schedule: values.schedule,
@@ -149,7 +159,20 @@ const PaymentForm = ({ isOpen, onOpenChange, payment }: PaymentFormProps) => {
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
-          <form className="space-y-4">
+          <form id="payment-form" className="space-y-4">
+            <FormField
+              name="name"
+              control={form.control}
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Name</FormLabel>
+                  <FormControl>
+                    <Input {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
             <FormField
               control={form.control}
               name="clientId"
@@ -263,7 +286,8 @@ const PaymentForm = ({ isOpen, onOpenChange, payment }: PaymentFormProps) => {
         </Form>
         <DialogFooter>
           <Button
-            type="button"
+            type="submit"
+            form="payment-form"
             disabled={
               !form.formState.isValid ||
               updateMutation.isPending ||

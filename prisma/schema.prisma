@@ -27,6 +27,7 @@ enum PaymentSchedule {
 
 model Payment {
     id       String          @id @default(cuid())
+    name     String
     status   PaymentStatus   @default(UNPAID)
     date     DateTime        @db.Date
     schedule PaymentSchedule
@@ -38,7 +39,9 @@ model Payment {
 model Client {
     id       String    @id @default(cuid())
     name     String
-    email    String
+    company  String?
+    email    String?
+    phone    String?
     payments Payment[]
 }
 

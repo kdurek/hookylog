@@ -26,12 +26,28 @@ import { type SubmitHandler, useForm } from "react-hook-form";
 import { z } from "zod";
 
 const formSchema = z.object({
-  name: z.string({
-    required_error: "Name is empty",
-  }),
-  email: z.string({
-    required_error: "Email is empty",
-  }),
+  name: z
+    .string({
+      required_error: "Name is empty",
+    })
+    .min(3),
+  company: z
+    .string({
+      required_error: "Company is empty",
+    })
+    .optional(),
+  email: z
+    .string({
+      required_error: "Email is empty",
+    })
+    .email()
+    .optional(),
+  phone: z
+    .string({
+      required_error: "Phone is empty",
+    })
+    .min(9)
+    .optional(),
 });
 
 interface ClientFormProps {
@@ -45,7 +61,9 @@ const ClientForm = ({ isOpen, onOpenChange, client }: ClientFormProps) => {
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: "",
+      company: "",
       email: "",
+      phone: "",
     },
     mode: "onChange",
   });
@@ -62,12 +80,16 @@ const ClientForm = ({ isOpen, onOpenChange, client }: ClientFormProps) => {
     if (client) {
       form.reset({
         name: client.name,
-        email: client.email,
+        company: client.company ?? "",
+        email: client.email ?? "",
+        phone: client.phone ?? "",
       });
     } else {
       form.reset({
         name: "",
+        company: "",
         email: "",
+        phone: "",
       });
     }
   }, [form, isOpen, client]);
@@ -77,7 +99,9 @@ const ClientForm = ({ isOpen, onOpenChange, client }: ClientFormProps) => {
   ) => {
     const newClient = {
       name: values.name,
+      company: values.company,
       email: values.email,
+      phone: values.phone,
     };
     if (client) {
       updateMutation.mutate({ ...newClient, id: client.id });
@@ -103,7 +127,7 @@ const ClientForm = ({ isOpen, onOpenChange, client }: ClientFormProps) => {
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
-          <form className="space-y-4">
+          <form id="client-form" className="space-y-4">
             <FormField
               name="name"
               control={form.control}
@@ -118,13 +142,39 @@ const ClientForm = ({ isOpen, onOpenChange, client }: ClientFormProps) => {
               )}
             />
             <FormField
+              name="company"
+              control={form.control}
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Company</FormLabel>
+                  <FormControl>
+                    <Input {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
               name="email"
               control={form.control}
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Email</FormLabel>
                   <FormControl>
-                    <Input {...field} />
+                    <Input type="email" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              name="phone"
+              control={form.control}
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Phone</FormLabel>
+                  <FormControl>
+                    <Input type="number" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -134,7 +184,8 @@ const ClientForm = ({ isOpen, onOpenChange, client }: ClientFormProps) => {
         </Form>
         <DialogFooter>
           <Button
-            type="button"
+            type="submit"
+            form="client-form"
             disabled={
               !form.formState.isValid ||
               updateMutation.isPending ||

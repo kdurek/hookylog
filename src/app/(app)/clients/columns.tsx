@@ -38,6 +38,21 @@ export const getClientColumns = ({
     cell: ({ row }) => <div className="px-4">{row.original.name}</div>,
   },
   {
+    accessorKey: "company",
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Company
+          <ArrowUpDown />
+        </Button>
+      );
+    },
+    cell: ({ row }) => <div className="px-4">{row.original.company}</div>,
+  },
+  {
     accessorKey: "email",
     header: ({ column }) => {
       return (
@@ -51,6 +66,21 @@ export const getClientColumns = ({
       );
     },
     cell: ({ row }) => <div className="px-4">{row.original.email}</div>,
+  },
+  {
+    accessorKey: "phone",
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Phone
+          <ArrowUpDown />
+        </Button>
+      );
+    },
+    cell: ({ row }) => <div className="px-4">{row.original.phone}</div>,
   },
   {
     id: "actions",

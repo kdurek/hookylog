@@ -32,6 +32,11 @@ export const getPaymentColumns = ({
   onSetAsPaid,
 }: PaymentColumnsProps): ColumnDef<PaymentWithClient>[] => [
   {
+    accessorKey: "name",
+    header: "Name",
+    cell: ({ row }) => <div>{row.original.name}</div>,
+  },
+  {
     accessorKey: "status",
     header: ({ column }) => {
       return (

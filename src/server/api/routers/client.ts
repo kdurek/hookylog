@@ -11,14 +11,18 @@ export const clientRouter = createTRPCRouter({
     .input(
       z.object({
         name: z.string(),
-        email: z.string().email(),
+        company: z.string().optional(),
+        email: z.string().email().optional(),
+        phone: z.string().optional(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
       return ctx.db.client.create({
         data: {
           name: input.name,
+          company: input.company,
           email: input.email,
+          phone: input.phone,
         },
       });
     }),
@@ -28,7 +32,9 @@ export const clientRouter = createTRPCRouter({
       z.object({
         id: z.string().cuid(),
         name: z.string(),
-        email: z.string().email(),
+        company: z.string().optional(),
+        email: z.string().email().optional(),
+        phone: z.string().optional(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
@@ -36,7 +42,9 @@ export const clientRouter = createTRPCRouter({
         where: { id: input.id },
         data: {
           name: input.name,
+          company: input.company,
           email: input.email,
+          phone: input.phone,
         },
       });
     }),
