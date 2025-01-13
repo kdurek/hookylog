@@ -1,14 +1,14 @@
-import { LoginForm } from "@/app/(auth)/login/form";
+import { RegisterForm } from "@/app/(auth)/register/form";
 import { auth } from "@/server/auth";
 import { db } from "@/server/db";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
-export default async function LoginPage() {
+export default async function RegisterPage() {
   const userAlreadyCreated = await db.user.findFirst();
 
-  if (!userAlreadyCreated) {
-    redirect("/register");
+  if (userAlreadyCreated) {
+    redirect("/login");
   }
 
   const session = await auth.api.getSession({
@@ -22,7 +22,7 @@ export default async function LoginPage() {
   return (
     <div className="flex min-h-svh w-full items-center justify-center p-6 md:p-10">
       <div className="w-full max-w-sm">
-        <LoginForm />
+        <RegisterForm />
       </div>
     </div>
   );
