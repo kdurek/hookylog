@@ -1,9 +1,9 @@
 FROM node:22-alpine AS base
 RUN corepack enable
+RUN apk add --no-cache libc6-compat
 
 # Dependencies
 FROM base AS deps
-RUN apk add --no-cache libc6-compat
 WORKDIR /app
 
 COPY package.json pnpm-lock.yaml* ./
