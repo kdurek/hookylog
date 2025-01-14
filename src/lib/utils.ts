@@ -1,4 +1,5 @@
 import { clsx, type ClassValue } from "clsx";
+import { format } from "date-fns";
 import { twMerge } from "tailwind-merge";
 
 export function cn(...inputs: ClassValue[]) {
@@ -17,6 +18,10 @@ const currencyFormatter = new Intl.NumberFormat("pl-PL", {
 
 export const formatCurrency = (value: number) => {
   return currencyFormatter.format(value);
+};
+
+export const formatDate = (value: Date) => {
+  return format(value, "yyyy-MM-dd");
 };
 
 export const convertCurrencyToNumber = (amount: string): number =>

@@ -9,7 +9,6 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { format } from "date-fns";
 import { useEffect } from "react";
 import { type SubmitHandler, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -34,6 +33,7 @@ import {
 import {
   cn,
   convertCurrencyToNumber,
+  formatDate,
   isAmountWithinRange,
   MAX_VALUE,
   removeTimezoneFromDate,
@@ -217,7 +217,7 @@ const PaymentForm = ({ isOpen, onOpenChange, payment }: PaymentFormProps) => {
                           )}
                         >
                           {field.value ? (
-                            format(field.value, "yyyy-MM-dd")
+                            formatDate(field.value)
                           ) : (
                             <span>Pick a date</span>
                           )}

@@ -11,9 +11,9 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import MoneyWithCurrency from "@/components/ui/money-with-currency";
+import { formatDate } from "@/lib/utils";
 import { PaymentStatus, type Prisma } from "@prisma/client";
 import { type ColumnDef } from "@tanstack/react-table";
-import { format } from "date-fns";
 import { ArrowUpDown, MoreHorizontal } from "lucide-react";
 
 type PaymentWithClient = Prisma.PaymentGetPayload<{
@@ -83,7 +83,7 @@ export const getPaymentColumns = ({
       );
     },
     cell: ({ row }) => (
-      <div className="px-4">{format(row.original.date, "yyyy-MM-dd")}</div>
+      <div className="px-4">{formatDate(row.original.date)}</div>
     ),
   },
   {
