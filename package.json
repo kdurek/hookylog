@@ -4,13 +4,13 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "next build",
+    "build": "tsx esbuild.config.ts && next build",
     "check": "next lint && tsc --noEmit",
     "db:generate": "prisma migrate dev",
     "db:migrate": "prisma migrate deploy",
     "db:push": "prisma db push",
     "db:studio": "prisma studio",
-    "dev": "next dev --turbo",
+    "dev": "tsx watch --tsconfig tsconfig.server.json src/server/index.ts",
     "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,mdx}\" --cache",
     "format:write": "prettier --write \"**/*.{ts,tsx,js,jsx,mdx}\" --cache",
     "postinstall": "prisma generate",
@@ -18,7 +18,7 @@
     "lint:fix": "next lint --fix",
     "preview": "next build && next start",
     "start": "next start",
-    "start:migrate": "pnpm dlx prisma migrate deploy && node server.js",
+    "start:migrate": "pnpm dlx prisma migrate deploy && node dist/server.mjs",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
@@ -43,6 +43,7 @@
     "better-auth": "^1.1.11",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "cron": "^3.5.0",
     "date-fns": "^4.1.0",
     "geist": "^1.3.0",
     "lucide-react": "^0.471.0",
@@ -65,6 +66,7 @@
     "@types/react-dom": "^18.3.0",
     "@typescript-eslint/eslint-plugin": "^8.1.0",
     "@typescript-eslint/parser": "^8.1.0",
+    "esbuild": "^0.24.2",
     "eslint": "^8.57.0",
     "eslint-config-next": "^15.0.1",
     "postcss": "^8.4.39",
@@ -72,6 +74,7 @@
     "prettier-plugin-tailwindcss": "^0.6.5",
     "prisma": "^5.14.0",
     "tailwindcss": "^3.4.3",
+    "tsx": "^4.19.2",
     "typescript": "^5.5.3"
   },
   "ct3aMetadata": {
