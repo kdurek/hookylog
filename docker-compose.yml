@@ -11,10 +11,8 @@ services:
       - 3000:3000
     networks:
       - hookylog
-    environment:
-      - DISCORD_WEBHOOK_URL=${DISCORD_WEBHOOK_URL}
-      - BETTER_AUTH_SECRET=${BETTER_AUTH_SECRET}
-      - DATABASE_URL=${DATABASE_URL}
+    env_file:
+      - .env
   postgres:
     container_name: hookylog-postgres
     image: postgres:alpine
