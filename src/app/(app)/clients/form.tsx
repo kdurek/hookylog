@@ -24,6 +24,7 @@ import { Loader2 } from "lucide-react";
 import { useEffect } from "react";
 import { type SubmitHandler, useForm } from "react-hook-form";
 import { z } from "zod";
+import { toast } from "sonner";
 
 const formSchema = z.object({
   name: z
@@ -67,11 +68,23 @@ const ClientForm = ({ isOpen, onOpenChange, client }: ClientFormProps) => {
   });
 
   const createMutation = api.client.create.useMutation({
-    onSuccess: () => onOpenChange(false),
+    onSuccess: () => {
+      toast.success("Client was created successfully");
+      onOpenChange(false);
+    },
+    onError: (error) => {
+      toast.error(error.message);
+    },
   });
 
   const updateMutation = api.client.update.useMutation({
-    onSuccess: () => onOpenChange(false),
+    onSuccess: () => {
+      toast.success("Client was updated successfully");
+      onOpenChange(false);
+    },
+    onError: (error) => {
+      toast.error(error.message);
+    },
   });
 
   useEffect(() => {

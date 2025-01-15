@@ -6,10 +6,18 @@ import { DataTable } from "../../../components/ui/data-table";
 import { useCallback, useMemo, useState } from "react";
 import type { Client } from "@prisma/client";
 import ClientForm from "@/app/(app)/clients/form";
+import { toast } from "sonner";
 
 export default function ClientsPageClient() {
   const [clients] = api.client.getAll.useSuspenseQuery();
-  const deleteMutation = api.client.delete.useMutation();
+  const deleteMutation = api.client.delete.useMutation({
+    onSuccess: () => {
+      toast.success("Client was deleted successfully");
+    },
+    onError: (error) => {
+      toast.error(error.message);
+    },
+  });
 
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
   const [selectedClient, setSelectedClient] = useState<Client | null>(null);

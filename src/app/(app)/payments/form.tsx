@@ -46,6 +46,7 @@ import {
 } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
 import { Input } from "@/components/ui/input";
+import { toast } from "sonner";
 
 const formSchema = z.object({
   name: z
@@ -98,11 +99,23 @@ const PaymentForm = ({ isOpen, onOpenChange, payment }: PaymentFormProps) => {
   });
 
   const createMutation = api.payment.create.useMutation({
-    onSuccess: () => onOpenChange(false),
+    onSuccess: () => {
+      toast.success("Payment was created successfully");
+      onOpenChange(false);
+    },
+    onError: (error) => {
+      toast.error(error.message);
+    },
   });
 
   const updateMutation = api.payment.update.useMutation({
-    onSuccess: () => onOpenChange(false),
+    onSuccess: () => {
+      toast.success("Payment was updated successfully");
+      onOpenChange(false);
+    },
+    onError: (error) => {
+      toast.error(error.message);
+    },
   });
 
   useEffect(() => {

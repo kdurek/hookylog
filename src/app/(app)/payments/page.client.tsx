@@ -6,11 +6,26 @@ import { DataTable } from "../../../components/ui/data-table";
 import { useCallback, useMemo, useState } from "react";
 import type { Payment } from "@prisma/client";
 import PaymentForm from "@/app/(app)/payments/form";
+import { toast } from "sonner";
 
 export default function PaymentsPageClient() {
   const [payments] = api.payment.getAll.useSuspenseQuery();
-  const deleteMutation = api.payment.delete.useMutation();
-  const setAsPaidMutation = api.payment.setAsPaid.useMutation();
+  const deleteMutation = api.payment.delete.useMutation({
+    onSuccess: () => {
+      toast.success("Payment was deleted successfully");
+    },
+    onError: (error) => {
+      toast.error(error.message);
+    },
+  });
+  const setAsPaidMutation = api.payment.setAsPaid.useMutation({
+    onSuccess: () => {
+      toast.success("Payment was set as paid successfully");
+    },
+    onError: (error) => {
+      toast.error(error.message);
+    },
+  });
 
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
   const [selectedPayment, setSelectedPayment] = useState<Payment | null>(null);

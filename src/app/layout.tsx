@@ -5,6 +5,7 @@ import { type Metadata } from "next";
 
 import { TRPCReactProvider } from "@/trpc/react";
 import RootLayoutClient from "@/app/layout.client";
+import { Toaster } from "@/components/ui/sonner";
 
 export const metadata: Metadata = {
   title: "Hookylog",
@@ -20,6 +21,7 @@ export default function RootLayout({
       <body>
         <RootLayoutClient />
         <TRPCReactProvider>{children}</TRPCReactProvider>
+        <Toaster />
       </body>
     </html>
   );
