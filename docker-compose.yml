@@ -1,18 +1,18 @@
 services:
-  app:
-    container_name: hookylog-app
-    build:
-      context: .
-      dockerfile: Dockerfile
-    restart: unless-stopped
-    depends_on:
-      - postgres
-    ports:
-      - 3000:3000
-    networks:
-      - hookylog
-    env_file:
-      - .env
+  # app:
+  #   container_name: hookylog-app
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile
+  #   restart: unless-stopped
+  #   depends_on:
+  #     - postgres
+  #   ports:
+  #     - 3000:3000
+  #   networks:
+  #     - hookylog
+  #   env_file:
+  #     - .env
   postgres:
     container_name: hookylog-postgres
     image: postgres:alpine
