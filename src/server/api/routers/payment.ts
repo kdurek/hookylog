@@ -3,11 +3,30 @@ import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc";
 import { PaymentSchedule, PaymentStatus } from "@prisma/client";
 import { TRPCError } from "@trpc/server";
-import { addMonths, addYears } from "date-fns";
+import { addMonths, addYears, startOfToday } from "date-fns";
+import { removeTimezoneFromDate } from "@/lib/utils";
 
 export const paymentRouter = createTRPCRouter({
   getAll: protectedProcedure.query(async ({ ctx }) => {
     const payments = await ctx.db.payment.findMany({
+      include: {
+        client: true,
+      },
+      orderBy: {
+        date: "desc",
+      },
+    });
+    return payments;
+  }),
+
+  getUnpaid: protectedProcedure.query(async ({ ctx }) => {
+    const payments = await ctx.db.payment.findMany({
+      where: {
+        status: PaymentStatus.UNPAID,
+        date: {
+          lte: removeTimezoneFromDate(startOfToday()),
+        },
+      },
       include: {
         client: true,
       },
