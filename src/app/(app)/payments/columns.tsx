@@ -113,11 +113,6 @@ export const getPaymentColumns = ({
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
             <DropdownMenuItem
-              onClick={() => navigator.clipboard.writeText(row.original.id)}
-            >
-              Copy payment ID
-            </DropdownMenuItem>
-            <DropdownMenuItem
               onClick={() => onSetAsPaid(row.original)}
               disabled={row.original.status === PaymentStatus.PAID}
             >

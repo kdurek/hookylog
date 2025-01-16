@@ -25,6 +25,9 @@ export const notificationJob: CronJobParams = {
       include: {
         client: true,
       },
+      orderBy: {
+        date: "desc",
+      },
     });
 
     const paymentsByDate = payments.reduce<Record<string, typeof payments>>(
