@@ -46,6 +46,7 @@ model User {
     name          String
     email         String
     emailVerified Boolean
+    image         String?
     createdAt     DateTime
     updatedAt     DateTime
     sessions      Session[]

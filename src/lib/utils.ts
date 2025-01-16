@@ -33,3 +33,8 @@ export const isAmountWithinRange = (amount: number): boolean =>
 export const removeTimezoneFromDate = (date: Date): Date => {
   return new Date(date.getTime() - date.getTimezoneOffset() * 60000);
 };
+
+export const getUserInitials = (name: string): string => {
+  const [firstName, lastName] = name.split(" ");
+  return `${firstName?.charAt(0)}${lastName?.charAt(0)}`;
+};
