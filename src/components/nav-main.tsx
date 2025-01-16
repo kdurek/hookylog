@@ -11,6 +11,7 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import { usePathname } from "next/navigation";
+import { cn } from "@/lib/utils";
 
 export function NavMain({
   items,
@@ -31,8 +32,8 @@ export function NavMain({
   return (
     <>
       {items.map((item) => (
-        <SidebarGroup key={item.title}>
-          <SidebarGroupLabel>{item.title}</SidebarGroupLabel>
+        <SidebarGroup key={item.title} className={cn(!item.title && "mt-2")}>
+          {item.title && <SidebarGroupLabel>{item.title}</SidebarGroupLabel>}
           <SidebarGroupContent>
             <SidebarMenu>
               {item.items?.map((item) => (

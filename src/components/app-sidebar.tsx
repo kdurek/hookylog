@@ -11,29 +11,7 @@ import { NavUser } from "@/components/nav-user";
 import { auth } from "@/server/auth";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
-
-const data = {
-  navMain: [
-    {
-      title: "Home",
-      url: "#",
-      items: [
-        {
-          title: "Dashboard",
-          url: "/",
-        },
-        {
-          title: "Payments",
-          url: "/payments",
-        },
-        {
-          title: "Clients",
-          url: "/clients",
-        },
-      ],
-    },
-  ],
-};
+import { navItems } from "@/app/(app)/nav-items";
 
 export async function AppSidebar({
   ...props
@@ -49,12 +27,11 @@ export async function AppSidebar({
   return (
     <Sidebar {...props}>
       <SidebarContent>
-        <NavMain items={data.navMain} />
+        <NavMain items={navItems} />
       </SidebarContent>
       <SidebarFooter>
         <NavUser user={session.user} />
       </SidebarFooter>
-
       <SidebarRail />
     </Sidebar>
   );
