@@ -7,6 +7,7 @@ import { useCallback, useMemo, useState } from "react";
 import type { Payment } from "@prisma/client";
 import PaymentForm from "@/app/(app)/payments/form";
 import { toast } from "sonner";
+import SetAsPaidForm from "@/app/(app)/payments/set-as-paid-form";
 
 export default function PaymentsPageClient() {
   const [payments] = api.payment.getAll.useSuspenseQuery();
@@ -18,21 +19,15 @@ export default function PaymentsPageClient() {
       toast.error(error.message);
     },
   });
-  const setAsPaidMutation = api.payment.setAsPaid.useMutation({
-    onSuccess: () => {
-      toast.success("Payment was set as paid successfully");
-    },
-    onError: (error) => {
-      toast.error(error.message);
-    },
-  });
 
-  const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
+  const [isUpdateDialogOpen, setIsUpdateDialogOpen] = useState<boolean>(false);
+  const [isSetAsPaidDialogOpen, setIsSetAsPaidDialogOpen] =
+    useState<boolean>(false);
   const [selectedPayment, setSelectedPayment] = useState<Payment | null>(null);
 
   const onUpdate = useCallback((payment: Payment) => {
     setSelectedPayment(payment);
-    setIsDialogOpen(true);
+    setIsUpdateDialogOpen(true);
   }, []);
 
   const onDelete = useCallback(
@@ -42,12 +37,10 @@ export default function PaymentsPageClient() {
     [deleteMutation],
   );
 
-  const onSetAsPaid = useCallback(
-    (payment: Payment) => {
-      setAsPaidMutation.mutate({ id: payment.id });
-    },
-    [setAsPaidMutation],
-  );
+  const onSetAsPaid = useCallback((payment: Payment) => {
+    setSelectedPayment(payment);
+    setIsSetAsPaidDialogOpen(true);
+  }, []);
 
   const paymentsColumns = useMemo(
     () => getPaymentColumns({ onUpdate, onDelete, onSetAsPaid }),
@@ -56,15 +49,25 @@ export default function PaymentsPageClient() {
 
   return (
     <div className="max-w-[100vw] p-4 md:max-w-[calc(100vw-16rem)]">
+      <SetAsPaidForm
+        isOpen={isSetAsPaidDialogOpen}
+        payment={selectedPayment}
+        onOpenChange={(value) => {
+          setIsSetAsPaidDialogOpen(value);
+          if (!value) {
+            setSelectedPayment(null);
+          }
+        }}
+      />
       <DataTable
         columns={paymentsColumns}
         data={payments}
         updateCreateComponent={
           <PaymentForm
-            isOpen={isDialogOpen}
+            isOpen={isUpdateDialogOpen}
             payment={selectedPayment}
             onOpenChange={(value) => {
-              setIsDialogOpen(value);
+              setIsUpdateDialogOpen(value);
               if (!value) {
                 setSelectedPayment(null);
               }

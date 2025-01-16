@@ -99,6 +99,7 @@ export const paymentRouter = createTRPCRouter({
     .input(
       z.object({
         id: z.string().cuid(),
+        name: z.string(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
@@ -143,7 +144,7 @@ export const paymentRouter = createTRPCRouter({
 
       return ctx.db.payment.create({
         data: {
-          name: paidPayment.name,
+          name: input.name,
           clientId: paidPayment.clientId,
           date: newDate,
           schedule: paidPayment.schedule,
