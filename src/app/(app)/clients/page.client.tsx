@@ -6,20 +6,13 @@ import { DataTable } from "../../../components/ui/data-table";
 import { useCallback, useMemo, useState } from "react";
 import type { Client } from "@prisma/client";
 import ClientForm from "@/app/(app)/clients/form";
-import { toast } from "sonner";
+import { ClientDelete } from "@/app/(app)/clients/delete";
 
 export default function ClientsPageClient() {
   const [clients] = api.client.getAll.useSuspenseQuery();
-  const deleteMutation = api.client.delete.useMutation({
-    onSuccess: () => {
-      toast.success("Client was deleted successfully");
-    },
-    onError: (error) => {
-      toast.error(error.message);
-    },
-  });
 
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState<boolean>(false);
   const [selectedClient, setSelectedClient] = useState<Client | null>(null);
 
   const onUpdate = useCallback((client: Client) => {
@@ -27,12 +20,10 @@ export default function ClientsPageClient() {
     setIsDialogOpen(true);
   }, []);
 
-  const onDelete = useCallback(
-    (client: Client) => {
-      deleteMutation.mutate({ id: client.id });
-    },
-    [deleteMutation],
-  );
+  const onDelete = useCallback((client: Client) => {
+    setSelectedClient(client);
+    setIsDeleteDialogOpen(true);
+  }, []);
 
   const clientsColumns = useMemo(
     () => getClientColumns({ onUpdate, onDelete }),
@@ -41,6 +32,16 @@ export default function ClientsPageClient() {
 
   return (
     <div className="max-w-[100vw] p-4 md:max-w-[calc(100vw-16rem)]">
+      <ClientDelete
+        isOpen={isDeleteDialogOpen}
+        client={selectedClient}
+        onOpenChange={(value) => {
+          setIsDeleteDialogOpen(value);
+          if (!value) {
+            setSelectedClient(null);
+          }
+        }}
+      />
       <DataTable
         columns={clientsColumns}
         data={clients}

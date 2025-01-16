@@ -6,21 +6,14 @@ import { DataTable } from "../../../components/ui/data-table";
 import { useCallback, useMemo, useState } from "react";
 import type { Payment } from "@prisma/client";
 import PaymentForm from "@/app/(app)/payments/form";
-import { toast } from "sonner";
 import SetAsPaidForm from "@/app/(app)/payments/set-as-paid-form";
+import { PaymentDelete } from "@/app/(app)/payments/delete";
 
 export default function PaymentsPageClient() {
   const [payments] = api.payment.getAll.useSuspenseQuery();
-  const deleteMutation = api.payment.delete.useMutation({
-    onSuccess: () => {
-      toast.success("Payment was deleted successfully");
-    },
-    onError: (error) => {
-      toast.error(error.message);
-    },
-  });
 
   const [isUpdateDialogOpen, setIsUpdateDialogOpen] = useState<boolean>(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState<boolean>(false);
   const [isSetAsPaidDialogOpen, setIsSetAsPaidDialogOpen] =
     useState<boolean>(false);
   const [selectedPayment, setSelectedPayment] = useState<Payment | null>(null);
@@ -30,12 +23,10 @@ export default function PaymentsPageClient() {
     setIsUpdateDialogOpen(true);
   }, []);
 
-  const onDelete = useCallback(
-    (payment: Payment) => {
-      deleteMutation.mutate({ id: payment.id });
-    },
-    [deleteMutation],
-  );
+  const onDelete = useCallback((payment: Payment) => {
+    setSelectedPayment(payment);
+    setIsDeleteDialogOpen(true);
+  }, []);
 
   const onSetAsPaid = useCallback((payment: Payment) => {
     setSelectedPayment(payment);
@@ -54,6 +45,16 @@ export default function PaymentsPageClient() {
         payment={selectedPayment}
         onOpenChange={(value) => {
           setIsSetAsPaidDialogOpen(value);
+          if (!value) {
+            setSelectedPayment(null);
+          }
+        }}
+      />
+      <PaymentDelete
+        isOpen={isDeleteDialogOpen}
+        payment={selectedPayment}
+        onOpenChange={(value) => {
+          setIsDeleteDialogOpen(value);
           if (!value) {
             setSelectedPayment(null);
           }
